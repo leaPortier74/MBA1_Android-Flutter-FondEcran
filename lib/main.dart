@@ -3,34 +3,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fondecran/unsplash_image.dart';
 import 'package:fondecran/unsplash_categories.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:flutter_dotenv/flutter_dotenv.dart'  as DotEnv;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fondecran/network.dart';
 import 'item_list_categories.dart';
 import 'item_list_img.dart';
 
-Future<List<UnsplashImage>> fetchImage() async {
-  final response = await http
-      .get(Uri.parse('https://api.unsplash.com/photos/?client_id=nG1EZPZ93FLgN2I16rZgVDQU8sn9wt2CyBPdhpQ_KYk'));
-
-  if (response.statusCode == 200) {
-    return List<UnsplashImage>.from(jsonDecode(response.body).map((img) => UnsplashImage.fromJson(img)));
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
-
-Future<List<UnsplashCategories>> fetchCategory() async {
-  final response = await http
-      .get(Uri.parse('https://api.unsplash.com/topics/?client_id=nG1EZPZ93FLgN2I16rZgVDQU8sn9wt2CyBPdhpQ_KYk'));
-
-  if (response.statusCode == 200) {
-    return List<UnsplashCategories>.from(jsonDecode(response.body).map((img) => UnsplashCategories.fromJson(img)));
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
-
-void main() {
+Future main() async {
+  await DotEnv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -82,34 +62,16 @@ late Future<List<UnsplashCategories>> futureCategory;
           padding: EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
-              /* Container(
-                child: FutureBuilder<List<UnsplashCategories>>(
-                  future: fetchCategory(),
-                  builder: (context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      return  ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto)).toList()
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
-                    }
-
-                      // By default, show a loading spinner.
-                    return const CircularProgressIndicator();
-                  },
-                ),
-              ), */
               Container(
                 width: double.infinity,
-                height: 70,
+                height: 100,
                 child: FutureBuilder<List<UnsplashCategories>>(
                   future: fetchCategory(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return  ListView(
                         scrollDirection: Axis.horizontal,
-                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto)).toList()
+                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto, catTitle: e.title,)).toList()
                       );
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');
@@ -120,7 +82,6 @@ late Future<List<UnsplashCategories>> futureCategory;
                   },
                 ),
               ) ,
-              const SizedBox(height: 50.0),
               Container(
                 width: double.infinity,
                 height: 685,
