@@ -1,62 +1,32 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fondecran/unsplash_image.dart';
+import 'package:fondecran/unsplash_categories.dart';
 import 'package:http/http.dart' as http;
 
-Future<UnsplashImage> fetchImage() async {
+import 'item_list_categories.dart';
+import 'item_list_img.dart';
+
+Future<List<UnsplashImage>> fetchImage() async {
   final response = await http
-      .get(Uri.parse('https://api.unsplash.com/photos/random?client_id=nG1EZPZ93FLgN2I16rZgVDQU8sn9wt2CyBPdhpQ_KYk'));
+      .get(Uri.parse('https://api.unsplash.com/photos/?client_id=nG1EZPZ93FLgN2I16rZgVDQU8sn9wt2CyBPdhpQ_KYk'));
 
   if (response.statusCode == 200) {
-    return UnsplashImage.fromJson(jsonDecode(response.body));
+    return List<UnsplashImage>.from(jsonDecode(response.body).map((img) => UnsplashImage.fromJson(img)));
   } else {
     throw Exception('Failed to load album');
   }
 }
-class UnsplashImage{
-  String id;
-  String? description;
-  String regularUrl;
-  String fullUrl;
-  String rawUrl; //For downloading image only
-  String userName; //Attribution to the photographer
-  String userProfileUrl; //Photographer's profile
-  String userProfileImage; //Photographer's profile image
-  int likes;
-  String? blurHash; //Optional
-  String? downloadLocation; //Optional
-  Color? color; //Optional
 
-  UnsplashImage({
-    required this.id,
-    required this.description,
-    required this.regularUrl,
-    required this.fullUrl,
-    required this.rawUrl,
-    required this.userName,
-    required this.userProfileUrl,
-    required this.userProfileImage,
-    required this.likes,
-    required this.blurHash,
-    required this.downloadLocation,
-    required this.color,
-  });
+Future<List<UnsplashCategories>> fetchCategory() async {
+  final response = await http
+      .get(Uri.parse('https://api.unsplash.com/topics/?client_id=nG1EZPZ93FLgN2I16rZgVDQU8sn9wt2CyBPdhpQ_KYk'));
 
-  factory UnsplashImage.fromJson(Map<String, dynamic> json) {
-    return UnsplashImage(
-      id: json['id'],
-      description: json['description'],
-      regularUrl: json['urls']['regular'],
-      fullUrl: json['urls']['full'],
-      rawUrl: json['urls']['raw'],
-      userName: json['user']['name'],
-      userProfileUrl: json['user']['links']['self'],
-      userProfileImage: json['user']['profile_image']['small'],
-      likes: json['likes'],
-      blurHash: json['blur_hash'],
-      downloadLocation: json['title'],
-      color: json['color'],
-    );
+  if (response.statusCode == 200) {
+    return List<UnsplashCategories>.from(jsonDecode(response.body).map((img) => UnsplashCategories.fromJson(img)));
+  } else {
+    throw Exception('Failed to load album');
   }
 }
 
@@ -91,80 +61,92 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   
-late Future<UnsplashImage> futureImage;
+late Future<List<UnsplashImage>> futureImage;
+
+late Future<List<UnsplashCategories>> futureCategory;
 
   @override
   void initState() {
     super.initState();
     futureImage = fetchImage();
+    futureCategory = fetchCategory();
   }
 
-  List<UnsplashImage> imageUrlListToDisplay = [
-    
-
-
-
-    // "https://picsum.photos/id/1005/800/800",
-    // "https://picsum.photos/id/1004/800/800",
-    // "https://picsum.photos/id/1000/800/800",
-    // "https://picsum.photos/id/1005/800/800",
-    // "https://picsum.photos/id/1004/800/800",
-    // "https://picsum.photos/id/1000/800/800",
-    // "https://picsum.photos/id/1005/800/800",
-    // "https://picsum.photos/id/1004/800/800",
-    // "https://picsum.photos/id/1000/800/800",
-    // "https://picsum.photos/id/1005/800/800",
-    // "https://picsum.photos/id/1004/800/800",
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[600],
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Icon(Icons.menu),
-        title: Text("Home"),
-      ),
       body: SafeArea(
-        child: FutureBuilder<UnsplashImage>(
-            future: futureImage,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.id);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
+        child: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            children: <Widget>[
+              /* Container(
+                child: FutureBuilder<List<UnsplashCategories>>(
+                  future: fetchCategory(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      return  ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto)).toList()
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
 
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            },
+                      // By default, show a loading spinner.
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ), */
+              Container(
+                width: double.infinity,
+                height: 70,
+                child: FutureBuilder<List<UnsplashCategories>>(
+                  future: fetchCategory(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return  ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto)).toList()
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+
+                      // By default, show a loading spinner.
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ) ,
+              const SizedBox(height: 50.0),
+              Container(
+                width: double.infinity,
+                height: 685,
+                child: FutureBuilder<List<UnsplashImage>>(
+                  future: fetchImage(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return  GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        children: snapshot.data!.map((e) => ItemListImg(url: e.regularUrl)).toList()
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                      // By default, show a loading spinner.
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ) 
+            ]
           ),
-      //   child: Container(
-      //     child: GridView.count(
-      //       crossAxisCount: 2,
-      //       crossAxisSpacing: 10,
-      //       mainAxisSpacing: 10,
-      //       children: imageUrlListToDisplay
-      //         .map((item) => Card(
-      //           color: Colors.transparent,
-      //           elevation: 0,
-      //           child: Padding(
-      //             padding: const EdgeInsets.all(8.0),
-      //             child: MaterialButton(
-      //               onPressed: () { 
-
-      //                },
-      //               child: Image.network(
-      //                 item,
-      //               )
-      //             ),
-      //           ),
-      //         ))
-      //       .toList(),
-      // ))
-      ),
+        )
+      )
     );
   }
 }
