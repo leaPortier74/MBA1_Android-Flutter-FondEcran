@@ -15,4 +15,7 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-explication 
+## explication
+
+copier le .env.example et le coller dans un .env
+Dans le .env, mettez votre clé d'API et l'Url de l'API Unsplash
