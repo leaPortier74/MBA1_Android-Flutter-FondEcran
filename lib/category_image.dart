@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:fondecran/item_list_img.dart';
 import 'package:fondecran/unsplash_categories.dart';
+import 'package:fondecran/unsplash_image.dart';
 
 
 class CategoryImg extends StatelessWidget {
 
-  final UnsplashCategories catUrl;
+  final Future<List<UnsplashImage>> photoList;
   final UnsplashCategories catTitle;
+  final UnsplashCategories catUrl;
   
   const CategoryImg (
-    { required this.catUrl, required this.catTitle }
+    { required this.photoList, required this.catTitle, required this.catUrl }
   ) : super();
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.grey[600],
       body: SafeArea(
@@ -42,27 +47,28 @@ class CategoryImg extends StatelessWidget {
                 )
               ),
               const SizedBox(height: 20,),
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                children : [
-                  Card(
-                    color: Colors.transparent,
-                    elevation: 10,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        image: DecorationImage(
-                          image : NetworkImage(catUrl.listPhotos),
-                          fit: BoxFit.cover
-                        )
-                      ),
-                    ),
-                  )
-                ]
-              )
+              Container(
+                width: width,
+                height: height*0.71,
+                child: FutureBuilder<List<UnsplashImage>>(
+                  future: photoList,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return  GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        children: snapshot.data!.map((e) => ItemListImg(img: e)).toList()
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                      // By default, show a loading spinner.
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ) 
             ],
           )
         )

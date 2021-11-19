@@ -2,9 +2,20 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fondecran/main.dart';
 import 'package:fondecran/unsplash_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 class DetailPhoto extends StatelessWidget {
@@ -85,9 +96,9 @@ class DetailPhoto extends StatelessWidget {
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 10),
+                                      padding: const EdgeInsets.only(left: 30),
                                       child: ElevatedButton(
-                                        onPressed: () {log("Download");},
+                                        onPressed: _saveImage,
                                         child: const Text('Download', style: TextStyle(color: Colors.white),),
                                         style: ElevatedButton.styleFrom(primary: Colors.black54, fixedSize: const Size(130, 30)),
                                       ),
@@ -119,4 +130,15 @@ class DetailPhoto extends StatelessWidget {
       )
     );
   }
+
+  _saveImage() async {
+  var response = await Dio().get(
+         img.regularUrl,
+         options: Options(responseType: ResponseType.bytes));
+  await ImageGallerySaver.saveImage(
+         Uint8List.fromList(response.data),
+         quality: 60,);
+}
+
+  
 }

@@ -29,3 +29,13 @@ Future<List<UnsplashCategories>> fetchCategory() async {
     throw Exception('Failed to load album');
   }
 }
+
+Future<List<UnsplashImage>> fetchCategoryImages(String url) async {
+  final response = await http
+      .get(Uri.parse('$url?client_id=$apiKey' ));
+  if (response.statusCode == 200) {
+    return List<UnsplashImage>.from(jsonDecode(response.body).map((img) => UnsplashImage.fromJson(img)));
+  } else {
+    throw Exception('Failed to load album');
+  }
+}

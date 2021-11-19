@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fondecran/category_image.dart';
 import 'package:fondecran/unsplash_image.dart';
 import 'package:fondecran/unsplash_categories.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart'  as DotEnv;
@@ -68,7 +69,9 @@ late Future<List<UnsplashCategories>> futureCategory;
                     if (snapshot.hasData) {
                       return  ListView(
                         scrollDirection: Axis.horizontal,
-                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e, catTitle: e,)).toList()
+                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e, catTitle: e, fun: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryImg(catTitle: e, photoList: fetchCategoryImages(e.listPhotos), catUrl: e,)));
+                        })).toList()
                       );
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');

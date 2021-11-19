@@ -39,6 +39,9 @@ dependencies:
   url_launcher: ^6.0.13
   fluttertoast: ^8.0.8
   image_gallery_saver: ^1.7.1
+  dio: ^4.0.3
+  path_provider: ^2.0.7
+  permission_handler: ^8.3.0
 
 dev_dependencies:
   flutter_test:
