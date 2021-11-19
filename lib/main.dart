@@ -25,15 +25,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key}) : super(key: key);
 
-  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -59,7 +58,7 @@ late Future<List<UnsplashCategories>> futureCategory;
       backgroundColor: Colors.grey[600],
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
               Container(
@@ -71,12 +70,11 @@ late Future<List<UnsplashCategories>> futureCategory;
                     if (snapshot.hasData) {
                       return  ListView(
                         scrollDirection: Axis.horizontal,
-                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e.coverPhoto, catTitle: e.title,)).toList()
+                        children: snapshot.data!.map((e) => ItemListCat(catUrl: e, catTitle: e,)).toList()
                       );
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');
                     }
-
                       // By default, show a loading spinner.
                     return const CircularProgressIndicator();
                   },
@@ -94,7 +92,7 @@ late Future<List<UnsplashCategories>> futureCategory;
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        children: snapshot.data!.map((e) => ItemListImg(url: e.regularUrl)).toList()
+                        children: snapshot.data!.map((e) => ItemListImg(img: e)).toList()
                       );
                     } else if (snapshot.hasError) {
                       return Text('${snapshot.error}');
@@ -111,4 +109,3 @@ late Future<List<UnsplashCategories>> futureCategory;
     );
   }
 }
-
